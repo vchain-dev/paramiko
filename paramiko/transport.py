@@ -119,11 +119,11 @@ class Transport (threading.Thread, ClosingContextManager):
         'hmac-md5-96',
         'hmac-sha1',
     )
-    _preferred_keys = (
+    _preferred_keys = tuple(ECDSAKey.supported_key_format_identifiers()) + (
         'ssh-rsa',
         'ssh-dss',
-    ) + tuple(ECDSAKey.supported_key_format_identifiers())
-    _preferred_kex =  (
+    )
+    _preferred_kex = (
         'diffie-hellman-group1-sha1',
         'diffie-hellman-group14-sha1',
         'diffie-hellman-group-exchange-sha1',
@@ -207,9 +207,11 @@ class Transport (threading.Thread, ClosingContextManager):
     _key_info = {
         'ssh-rsa': RSAKey,
         'ssh-dss': DSSKey,
-        'ecdsa-sha2-nistp256': ECDSAKey,
     }
-
+    _key_info.update(
+        (name, ECDSAKey)
+        for name in ECDSAKey.supported_key_format_identifiers()
+    )
     _kex_info = {
         'diffie-hellman-group1-sha1': KexGroup1,
         'diffie-hellman-group14-sha1': KexGroup14,
